@@ -12,11 +12,7 @@ M.run_commands = {
 }
 
 function M.get_command(bufnr)
-	local ft = function()
-		if bufnr ~= nil then
-			return vim.filetype.match({ buf = bufnr })
-		end
-	end
+	local ft = vim.filetype.match({ buf = bufnr })
 	for ft_match, command in pairs(M.run_commands) do
 		if ft_match == ft then
 			return command
@@ -47,7 +43,6 @@ function M.buffer_attach(bufnr, command)
 			M.run_job(command, append_data)
 		end,
 	})
-	vim.notify("[run.nvim]: Attached to buffer.")
 end
 
 function M.run()
