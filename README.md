@@ -1,5 +1,6 @@
 # run.nvim
 
+<<<<<<< HEAD
 An extremely simple plugin for running code without leaving neovim.
 
 ## Requirements
@@ -47,9 +48,10 @@ end,
 ...
 
 - `use_default_bindings` (bool) : if true, maps `<C-b>` (control + b) `:Run`, which executes the filetype-specific command. **Note**: If you set this to false, you can instead bind the run command to a key of your choice as follows:
+
 ```lua
     vim.keymap.set("n", "<YOUR-KEY-HERE", "<cmd>Run<CR>", { silent = true, noremap = true })
-````
+```
 
 - `output_msg` (string) : message displayed at the top of the run window.
 
@@ -65,3 +67,4 @@ If you use the default configuration, or pass `use_default_bindings = true` to t
 ![showcase1](showcase1.gif)
 
 `run.nvim` registers a custom filetype for the opened window called `runwin`. This conveniently allows you to close the opened buffer using `q` rather than `:q` by associating an autocmd and keymap with `runwin`.
+````
