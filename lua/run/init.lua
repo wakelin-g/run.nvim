@@ -2,15 +2,6 @@ local M = {}
 
 local u = require("run.utils")
 
-local default_run_commands = {
-	["c"] = { "clang " .. vim.fn.expand("%") .. " && ./a.out" },
-	["cpp"] = { "clang++ " .. vim.fn.expand("%") .. " && ./a.out" },
-	["python"] = { "python3 " .. vim.fn.expand("%") },
-	["rust"] = { "cargo run" },
-	["go"] = { "go run " .. vim.fn.expand("%") },
-	["lua"] = { "lua " .. vim.fn.expand("%") },
-}
-
 M.config = {}
 
 function M.setup(args)
@@ -21,16 +12,7 @@ function M.setup(args)
 	M.config.win_width = tonumber(args.win_width) or 40
 	M.config.output_msg = args.output_msg or " -- OUTPUT -- "
 
-	for arg_key, arg_val in pairs(args.commands or {}) do
-		if default_run_commands[arg_key] == nil then
-			default_run_commands[arg_key] = arg_val
-		else
-			for _, val in pairs(arg_val) do
-				table.insert(default_run_commands[arg_key], val)
-			end
-		end
-	end
-	M.config.run_commands = default_run_commands
+	M.config.run_commands = args.commands
 end
 
 function M.get_command(ft)

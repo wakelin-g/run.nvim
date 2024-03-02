@@ -14,7 +14,7 @@ An extremely simple plugin for running code without leaving neovim.
 
 If you use the default configuration, or pass `use_default_bindings = true` to the setup function, you can use `<C-b>` to execute a filetype-specific predesignated code segment and display the results in a window opened to the right of your current buffer. Each time you save your file, the code segment will be automatically re-executed.
 
-![showcase1](showcase1.gif)
+![showcase2](showcase2.gif)
 
 You can close the window that opens by navigating to it and pressing `q`.
 
@@ -39,7 +39,7 @@ The default configuration is shown below.
 
 ## Configuration
 
-You can configure `run.nvim` by passing a table to `require("run").setup()` in your lazy plugin table. The following are the default options (if you don't need to change these, you can just leave `require("run").setup()` empty):
+You can configure `run.nvim` by passing a table to `require("run").setup()` in your lazy plugin table. The following are the default options:
 
 ```lua
 ...
@@ -48,16 +48,7 @@ config = function()
         use_default_bindings = true,
         output_msg = " -- OUTPUT -- ",
         win_width = 40,
-        commands = {
-            ["c"] = { "clang " .. vim.fn.expand("%") .. " && ./a.out" },
-            ["cpp"] = { "clang++ " .. vim.fn.expand("%") .. " && ./a.out" },
-            ["python"] = { "python " .. vim.fn.expand("%") },
-            ["rust"] = { "cargo run" },
-            ["go"] = { "go run " .. vim.fn.expand("%") },
-            ["lua"] = { "lua " .. vim.fn.expand("%") },
-            -- add custom commands here! ex:
-            -- ["sh"] = { "bash " .. vim.fn.expand("%") }
-        },
+        commands = {},
     })
 end,
 ...
@@ -74,4 +65,17 @@ end,
 - `win_width` (integer) : width of opened window (in character cells).
 
 - `commands` (table) : table of commands in `["<filetype>"] = { "<command1>", "<command2>", ... }` format, where `"<command>"` denotes the command that will be executed when `:Run` is called from a buffer with detected filetype of `["<filetype>"]`.
-  - If you are unsure of how neovim perceives your filetype of interest, enter a buffer of this filetype and execute `:lua print(vim.filetype.match({ buf = vim.api.nvim_get_current_buf() }))`.
+  - If you are unsure of how neovim perceives your filetype of interest, enter a buffer of this filetype and execute `:lua print(vim.filetype.match({ buf = vim.api.nvim_get_current_buf() }))`. As an example, your table might look something like:
+
+```lua
+{
+    ["c"] = { "clang " .. vim.fn.expand("%") .. " && ./a.out" },
+    ["cpp"] = { "clang++ " .. vim.fn.expand("%") .. " && ./a.out", "gcc-13 " .. vim.fn.expand("%") .. " && ./a.out" },
+    ["python"] = { "python " .. vim.fn.expand("%"), "python3 " .. vim.fn.expand("%") },
+    ["rust"] = { "cargo run" },
+    ["go"] = { "go run " .. vim.fn.expand("%") },
+    ["lua"] = { "lua " .. vim.fn.expand("%") },
+    -- add more custom commands here! ex:
+    -- ["sh"] = { "bash " .. vim.fn.expand("%") }
+}
+```
