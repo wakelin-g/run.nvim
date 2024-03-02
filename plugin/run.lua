@@ -6,9 +6,13 @@ vim.g.load_run = true
 
 local group = vim.api.nvim_create_augroup("RunGroup", { clear = true })
 
-vim.api.nvim_create_user_command("Run", function()
+vim.api.nvim_create_user_command("RunRun", function()
 	require("run").main()
-end, { desc = "run current file", force = false })
+end, { desc = "[run.nvim]: run current file", force = false })
+
+vim.api.nvim_create_user_command("RunSwitch", function()
+	require("run").change_command()
+end, { desc = "[run.nvim]: change current run command", force = false })
 
 vim.filetype.add({ runwin = "runwin" })
 

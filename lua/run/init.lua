@@ -6,7 +6,7 @@ local default_run_commands = {
 	["c"] = { "clang " .. vim.fn.expand("%") .. " && ./a.out" },
 	["cpp"] = { "clang++ " .. vim.fn.expand("%") .. " && ./a.out" },
 	["python"] = { "python3 " .. vim.fn.expand("%") },
-	["rs"] = { "cargo run" },
+	["rust"] = { "cargo run" },
 	["go"] = { "go run " .. vim.fn.expand("%") },
 	["lua"] = { "lua " .. vim.fn.expand("%") },
 }
@@ -16,7 +16,7 @@ M.config = {}
 function M.setup(args)
 	M.config.use_default_bindings = args.use_default_bindings or true
 	if M.config.use_default_bindings then
-		vim.keymap.set("n", "<C-b>", "<cmd>Run<CR>", { silent = true, noremap = true, desc = "run current file" })
+		vim.keymap.set("n", "<C-b>", "<cmd>RunRun<CR>", { silent = true, noremap = true, desc = "run current file" })
 	end
 	M.config.win_width = tonumber(args.win_width) or 40
 	M.config.output_msg = args.output_msg or " -- OUTPUT -- "
@@ -31,7 +31,6 @@ function M.setup(args)
 		end
 	end
 	M.config.run_commands = default_run_commands
-	-- M.config.run_commands = vim.tbl_deep_extend("force", args.commands or {}, default_run_commands)
 end
 
 function M.get_command(ft)
@@ -95,6 +94,11 @@ function M.change_command()
 	buffer_attach(vim.api.nvim_win_get_buf(vim.b.run_win), vim.b.run_buf_command)
 end
 
+local function make_window(bufnr)
+	vim.b.run_win = vim.api.nvim_open_win(bufnr, false, { split = "right", win = 0, style = "minimal" })
+	vim.api.nvim_win_set_width(vim.b.run_win, M.config.win_width)
+end
+
 function M.main()
 	local bufnr_cur = vim.api.nvim_get_current_buf()
 	local ft = vim.filetype.match({ buf = bufnr_cur })
@@ -106,17 +110,18 @@ function M.main()
 
 	if vim.b.run_buf_handle == nil then
 		vim.b.run_buf_handle = vim.api.nvim_create_buf(false, true)
-		local bufnr_out = vim.b.run_buf_handle
 		vim.b.run_buf_command = M.get_command(ft)
 
-		vim.api.nvim_set_option_value("filetype", "runwin", { buf = bufnr_out })
-		vim.api.nvim_buf_set_lines(bufnr_out, 0, -1, false, { M.config.output_msg, "" })
+		vim.api.nvim_set_option_value("filetype", "runwin", { buf = vim.b.run_buf_handle })
+		vim.api.nvim_buf_set_lines(vim.b.run_buf_handle, 0, -1, false, { M.config.output_msg, "" })
 
-		vim.b.run_win = vim.api.nvim_open_win(bufnr_out, false, { split = "right", win = 0, style = "minimal" })
-		vim.api.nvim_win_set_width(vim.b.run_win, M.config.win_width)
+		make_window(vim.b.run_buf_handle)
 		buffer_attach(vim.api.nvim_win_get_buf(vim.b.run_win), vim.b.run_buf_command)
 	end
 
+	if u.is_visible(vim.b.run_buf_handle) == false then
+		make_window(vim.b.run_buf_handle)
+	end
 	vim.api.nvim_buf_set_lines(vim.b.run_buf_handle, 0, -1, false, { M.config.output_msg, "" })
 	M.run_job(vim.b.run_buf_command, function(_, data)
 		if data then

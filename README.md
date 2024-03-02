@@ -2,6 +2,22 @@
 
 An extremely simple plugin for running code without leaving neovim.
 
+## Usage
+
+`run.nvim` exports two functions:
+
+- `RunRun` finds the filetype of the current buffer and matches it to code you have specified in your config, executes it, and displays the output in a split opened to the right. Calling `RunRun` again _or_ saving the file will re-execute the code, updating the output buffer.
+
+  - If you have specified multiple commands for a given filetype in your config, the first call to `RunRun` will ask you to choose one of them. Subsequent calls, however, will respect your previous choice.
+
+- `RunSwitch` allows you to change the command that `RunRun` will execute, given that there are multiple commands for a given filetype specified in your config.
+
+If you use the default configuration, or pass `use_default_bindings = true` to the setup function, you can use `<C-b>` to execute a filetype-specific predesignated code segment and display the results in a window opened to the right of your current buffer. Each time you save your file, the code segment will be automatically re-executed.
+
+![showcase1](showcase1.gif)
+
+You can close the window that opens by navigating to it and pressing `q`.
+
 ## Requirements
 
 - neovim nightly (tested with `v0.10.0-dev-2488+g5d4e1693c`)
@@ -33,14 +49,14 @@ config = function()
         output_msg = " -- OUTPUT -- ",
         win_width = 40,
         commands = {
-            ["c"] = "clang " .. vim.fn.expand("%") .. " && ./a.out",
-            ["cpp"] = "clang++ " .. vim.fn.expand("%") .. " && ./a.out",
-            ["python"] = "python " .. vim.fn.expand("%"),
-            ["rust"] = "cargo run",
-            ["go"] = "go run " .. vim.fn.expand("%"),
-            ["lua"] = "lua " .. vim.fn.expand("%"),
+            ["c"] = { "clang " .. vim.fn.expand("%") .. " && ./a.out" },
+            ["cpp"] = { "clang++ " .. vim.fn.expand("%") .. " && ./a.out" },
+            ["python"] = { "python " .. vim.fn.expand("%") },
+            ["rust"] = { "cargo run" },
+            ["go"] = { "go run " .. vim.fn.expand("%") },
+            ["lua"] = { "lua " .. vim.fn.expand("%") },
             -- add custom commands here! ex:
-            -- ["sh"] = "bash " .. vim.fn.expand("%")
+            -- ["sh"] = { "bash " .. vim.fn.expand("%") }
         },
     })
 end,
@@ -57,13 +73,5 @@ end,
 
 - `win_width` (integer) : width of opened window (in character cells).
 
-- `commands` (table) : table of commands in `["<filetype>"] = "<command>"` format, where `"<command>"` denotes the command that will be executed when `:Run` is called from a buffer with detected filetype of `["<filetype>"]`.
+- `commands` (table) : table of commands in `["<filetype>"] = { "<command1>", "<command2>", ... }` format, where `"<command>"` denotes the command that will be executed when `:Run` is called from a buffer with detected filetype of `["<filetype>"]`.
   - If you are unsure of how neovim perceives your filetype of interest, enter a buffer of this filetype and execute `:lua print(vim.filetype.match({ buf = vim.api.nvim_get_current_buf() }))`.
-
-## Usage
-
-If you use the default configuration, or pass `use_default_bindings = true` to the setup function, you can use `<C-b>` to execute a filetype-specific predesignated code segment and display the results in a window opened to the right of your current buffer. Each time you save your file, the code segment will be automatically re-executed.
-
-![showcase1](showcase1.gif)
-
-`run.nvim` registers a custom filetype for the opened window called `runwin`. This conveniently allows you to close the opened buffer using `q` rather than `:q` by associating an autocmd and keymap with `runwin`.
