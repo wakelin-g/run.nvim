@@ -48,6 +48,7 @@ config = function()
         use_default_bindings = true,
         output_msg = " -- OUTPUT -- ",
         win_width = 40,
+        set_wrap = false,
         commands = {},
     })
 end,
@@ -63,6 +64,8 @@ end,
 - `output_msg` (string) : message displayed at the top of the run window.
 
 - `win_width` (integer) : width of opened window (in character cells).
+
+- `set_wrap` (bool) : if true, wraps text of output buffer.
 
 - `commands` (table) : table of commands in `["<filetype>"] = { "<command1>", "<command2>", ... }` format, where `"<command>"` denotes the command that will be executed when `:Run` is called from a buffer with detected filetype of `["<filetype>"]`.
   - If you are unsure of how neovim perceives your filetype of interest, enter a buffer of this filetype and execute `:lua print(vim.filetype.match({ buf = vim.api.nvim_get_current_buf() }))`. As an example, your table might look something like:

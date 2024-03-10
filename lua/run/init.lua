@@ -11,6 +11,7 @@ function M.setup(args)
 	end
 	M.config.win_width = tonumber(args.win_width) or 40
 	M.config.output_msg = args.output_msg or " -- OUTPUT -- "
+	M.config.set_wrap = args.set_wrap or false
 
 	M.config.run_commands = args.commands
 end
@@ -25,7 +26,7 @@ function M.get_command(ft)
 				vim.ui.select(command, {
 					prompt = "Select command to run: ",
 					format_item = function(item)
-						return ft .. " : " .. item
+						return "(" .. ft .. ") " .. item
 					end,
 				}, function(choice)
 					selected = choice
@@ -79,6 +80,7 @@ end
 local function make_window(bufnr)
 	vim.b.run_win = vim.api.nvim_open_win(bufnr, false, { split = "right", win = 0, style = "minimal" })
 	vim.api.nvim_win_set_width(vim.b.run_win, M.config.win_width)
+	vim.wo[vim.b.run_win].wrap = M.config.set_wrap
 end
 
 function M.main()
